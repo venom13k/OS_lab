@@ -65,7 +65,7 @@ int main(int argc, char **argv)
   //start reading file
   //  f = addr1;
   //  while(!feof(fp)) {
-    sem_wait(mutex);
+  //    sem_wait(mutex);
     nBytes = fread(addr1, 1, SHM_SIZE, fp);
     //    *f = *f + SHM_SIZE;
     sem_post(mutex);
