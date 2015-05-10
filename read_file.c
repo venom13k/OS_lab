@@ -12,28 +12,25 @@ int main(int argc, char **argv) {
   char f[SHM_SIZE];
   if(argc <= 1) {
     printf("usage: server /path/to/file/filename \n");
-    return 0;
+    return 1;
   }
 
   fp = fopen(argv[1], "r");
-  if (fp==NULL)
+  if (fp==NULL) {
     perror("opening file error");
-/*
-  i = 0;
+    return 5;
+  }
 
-  while ((c = fgetc(fp)) != NULL  )  {                
-    f[++i] = (char) c;     
-    printf("%c", f[i]);
-  } 
-*/
+  fw = fopen("love.txt", "w");
   while(!feof(fp)) {
-    nBytes = fread(f, 1, SHM_SIZE, fp);
+    nBytes = fread(f, 1, BLOCK_SIZE, fp);
+    fwrite(f, 1, nBytes, fw);    
     printf("%s\n", f);
   }
 
 
-  fw = fopen("love.txt", "w");
-  fwrite(f, 1, nBytes, fw);  
+  
+  
   fclose(fp);
   fclose(fw);
 
