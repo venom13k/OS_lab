@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   } 
 */
   while(!feof(fp)) {
-    nBytes = fread(f, 1, BLOCK_SIZE, fp);
+    nBytes = fread(f, 1, SHM_SIZE, fp);
     printf("%s\n", f);
   }
 
