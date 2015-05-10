@@ -56,9 +56,9 @@ int main(int argc, char **argv)
   //  memcpy(f1, addr1, SHM_SIZE);
   fw = fopen("love.txt", "w");
   //  while(!feof(fp)) {
-  f1 = addr1;
+  //  f1 = addr1;
   sem_wait(mutex);
-  fwrite(f1, 1, SHM_SIZE, fw);    
+  fwrite(addr1, 1, SHM_SIZE, fw);    
   sem_post(mutex);
   printf("%s\n", f1);
     //  }
