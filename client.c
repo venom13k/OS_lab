@@ -18,7 +18,7 @@ int main(int argc, char **argv)
   FILE* destination_file;
   int shm_id;
   char* shm_location;
-  char* f1;
+  char* buf[SHM_SIZE];
   key_t key;
   sem_t *mutex;
 
@@ -55,8 +55,9 @@ int main(int argc, char **argv)
   destination_file = fopen(argv[1], "w");
   //  while(!feof(fp)) {
   //  f1 = addr1;
-  sem_wait(mutex);
-  fwrite(shm_location, 1, SHM_SIZE, destination_file);    
+  sem_wait(mutex);  
+  fwrite(buf, 1, SHM_SIZE, destination_file);
+  memcpy(buf, shm_location, SHM_SIZE);    
   sem_post(mutex);
   // printf("%s\n", s);
     //  }

@@ -17,7 +17,7 @@ int main(int argc, char **argv)
   int shm_id;
   int nBytes;
   char* shm_location;
-  char* f;
+  char* buf[SHM_SIZE];
   key_t key;
   sem_t *mutex;
 
@@ -67,8 +67,8 @@ int main(int argc, char **argv)
   //  f = addr1;
   //  while(!feof(fp)) {
   //    sem_wait(mutex);
-    nBytes = fread(shm_location, 1, SHM_SIZE, source_file);
-    //    *f = *f + SHM_SIZE;
+    nBytes = fread(buf, 1, SHM_SIZE, source_file);
+    memcpy(shm_location, &buf, SHM_SIZE);
     sem_post(mutex);
     //    }
 
