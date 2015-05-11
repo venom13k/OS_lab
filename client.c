@@ -15,9 +15,9 @@ char SEM_NAME[]= "vik";
 
 int main(int argc, char **argv)
 {
-  FILE* fw;
-  int shmid;
-  char* addr1;
+  FILE* destination_file;
+  int shm_id;
+  char* shm_location;
   char* f1;
   key_t key;
   sem_t *mutex;
@@ -25,48 +25,46 @@ int main(int argc, char **argv)
   key = 5678;
 
  if(argc <= 1) {
-    printf("usage: server /path/to/file/filename \n");
+    printf("usage: client /path/to/file/filename \n");
     return 1;
   }
 
   //create & initialize existing semaphore
   mutex = sem_open(SEM_NAME,0,0644,0);
-  if(mutex == SEM_FAILED)
-    {
-      perror("reader:unable to execute semaphore");
-      sem_close(mutex);
-      exit(-1);
-    }
+  if(mutex == SEM_FAILED) {
+    perror("reader:unable to execute semaphore");
+    sem_close(mutex);
+    exit(-1);
+  }
 
-  shmid = shmget(key, SHM_SIZE, SHM_R|SHM_W); // get the id of the fresshly allocated segment
-  if(shmid<0)
-    {
-      perror("reader:failure in shmget");
-      exit(-1);
-    }
-  printf("shmid = %d",shmid);
+  shm_id = shmget(key, SHM_SIZE, SHM_R|SHM_W); // get the id of the fresshly allocated segment
+  if(shm_id < 0) {
+    perror("reader:failure in shmget");
+    exit(-1);
+  }
+  printf("shmid = %d",shm_id);
 
-  addr1 = shmat(shmid, NULL, 0); // get address where our segment has been mapped using id.
-  if (addr1 == (char *)(-1)) // do a cast during the comparison to check for errors
-        perror("shmat"); 
-
-  printf("\nIPC SHARED MEMORY address is: %s",addr1);
+  shm_location = shmat(shm_id, NULL, 0); // get address where our segment has been mapped using id.
+  if (shm_location == (char *)(-1)) // do a cast during the comparison to check for errors
+    perror("shmat"); 
+  
+  printf("\nIPC SHARED MEMORY address is: %s", shm_location);
 
 
   //  memcpy(f1, addr1, SHM_SIZE);
-  fw = fopen("love.txt", "w");
+  destination_file = fopen(argv[1], "w");
   //  while(!feof(fp)) {
   //  f1 = addr1;
   sem_wait(mutex);
-  fwrite(addr1, 1, SHM_SIZE, fw);    
+  fwrite(shm_location, 1, SHM_SIZE, destination_file);    
   sem_post(mutex);
-  printf("%s\n", f1);
+  // printf("%s\n", s);
     //  }
 
 
-  printf("\nThe message is: %s", f1);
+  // printf("\nThe message is: %s",);
 
-  fclose(fw);
+  fclose(destination_file);
 
   return 0;
 

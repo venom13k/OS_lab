@@ -13,10 +13,10 @@ char SEM_NAME[]= "vik";
 
 int main(int argc, char **argv)
 {
-  FILE *fp;
-  int shmid;
+  FILE *source_file;
+  int shm_id;
   int nBytes;
-  char* addr1;
+  char* shm_location;
   char* f;
   key_t key;
   sem_t *mutex;
@@ -38,25 +38,26 @@ int main(int argc, char **argv)
     }
   
   //create the shared memory segment with this key
-  shmid = shmget(key, SHM_SIZE, IPC_CREAT|SHM_R|SHM_W); // get the id of the fresshly allocated segment
-  if(shmid<0)
+  shm_id = shmget(key, SHM_SIZE, IPC_CREAT|SHM_R|SHM_W); // get the id of the fresshly allocated segment
+  if(shm_id < 0)
     {
       perror("failure in shmget");
       exit(-1);
     }
-  printf("shmid = %d",shmid);
+  printf("shmid = %d",shm_id);
+
   //attach this segment to virtual memory
-  addr1 = shmat(shmid, NULL, 0); // get address where our segment has been mapped using id
-  if (addr1 == (char *)(-1)) // do a cast during the comparison to check for errors
+  shm_location = shmat(shm_id, NULL, 0); // get address where our segment has been mapped using id
+  if (shm_location == (char *)(-1)) // do a cast during the comparison to check for errors
         perror("shmat"); 
 
-  printf("\nIPC SHARED MEMORY address is: %s \n",addr1);
+  printf("\nIPC SHARED MEMORY address is: %s \n", shm_location);
 
   //copying your file at the shared location.
   //   memcpy(addr1, &f, SHM_SIZE);
 
-  fp = fopen(argv[1], "r");
-  if (fp==NULL) {
+  source_file = fopen(argv[1], "r");
+  if (source_file == NULL) {
     perror("opening file error");
     return 5;
   }
@@ -66,16 +67,16 @@ int main(int argc, char **argv)
   //  f = addr1;
   //  while(!feof(fp)) {
   //    sem_wait(mutex);
-    nBytes = fread(addr1, 1, SHM_SIZE, fp);
+    nBytes = fread(shm_location, 1, SHM_SIZE, source_file);
     //    *f = *f + SHM_SIZE;
     sem_post(mutex);
     //    }
 
 
-  fclose(fp);
+  fclose(source_file);
   sem_close(mutex);
   sem_unlink(SEM_NAME);
-  shmctl(shmid, IPC_RMID, 0);
+  shmctl(shm_id, IPC_RMID, 0);
   exit(0);
 
   printf("\nMESSAGE STORED\n");
