@@ -9,33 +9,45 @@
 #include<semaphore.h>
 
 #define SHM_SIZE 1024
-char SEM_NAME[]= "vik";
+char SEM1_NAME[]= "copy";
+char SEM2_NAME[]= "disk";
 
 
 
-int main(int argc, char **argv)
+//int main(int argc, char **argv)
+int main()
 {
   FILE* destination_file;
   int shm_id;
   char* shm_location;
-  char* buf[SHM_SIZE];
+  char  buf[SHM_SIZE];
   key_t key;
-  sem_t *mutex;
+  sem_t *data_in_memory;
+  sem_t *data_on_disk;
 
   key = 5678;
-
+  /*
  if(argc <= 1) {
     printf("usage: client /path/to/file/filename \n");
     return 1;
-  }
-
-  //create & initialize existing semaphore
-  mutex = sem_open(SEM_NAME,0,0644,0);
-  if(mutex == SEM_FAILED) {
-    perror("reader:unable to execute semaphore");
-    sem_close(mutex);
+    }*/
+ 
+  //create & initialize existing semaphore #1
+  data_in_memory = sem_open(SEM1_NAME,0,0644,0);
+  if(data_in_memory == SEM_FAILED) {
+    perror("reader1:unable to execute semaphore");
+    sem_close(data_in_memory);
     exit(-1);
   }
+  //create & initialize existing semaphore #1
+  data_on_disk = sem_open(SEM2_NAME,0,0644,0);
+  if(data_on_disk == SEM_FAILED) {
+    perror("reader2:unable to execute semaphore");
+    sem_close(data_on_disk);
+    exit(-1);
+  }
+ 
+
 
   shm_id = shmget(key, SHM_SIZE, SHM_R|SHM_W); // get the id of the fresshly allocated segment
   if(shm_id < 0) {
@@ -48,24 +60,28 @@ int main(int argc, char **argv)
   if (shm_location == (char *)(-1)) // do a cast during the comparison to check for errors
     perror("shmat"); 
   
-  printf("\nIPC SHARED MEMORY address is: %s", shm_location);
+  printf("\nIPC SHARED MEMORY address is: %p", shm_location);
 
 
   //  memcpy(f1, addr1, SHM_SIZE);
-  destination_file = fopen(argv[1], "w");
+  //destination_file = fopen(argv[1], "w");
   //  while(!feof(fp)) {
   //  f1 = addr1;
-  sem_wait(mutex);  
-  fwrite(buf, 1, SHM_SIZE, destination_file);
+  sem_wait(data_in_memory);  
   memcpy(buf, shm_location, SHM_SIZE);    
-  sem_post(mutex);
-  // printf("%s\n", s);
+  //  fwrite(&buf, 1, SHM_SIZE, destination_file);
+  printf("\nThe message is: %s\n", buf);
+
+  *shm_location = '*';
+
+  //  sem_post(data_on_disk);
+  //  printf("%s\n", s);
     //  }
+  
 
 
-  // printf("\nThe message is: %s",);
 
-  fclose(destination_file);
+  //fclose(destination_file);
 
   return 0;
 
