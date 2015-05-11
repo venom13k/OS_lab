@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 
   FILE *source_file;
   int shm_id;
-  int nBytes;
+  int i, nBytes;
   char* shm_location;
   char buf[SHM_SIZE];
   key_t key;
@@ -77,10 +77,16 @@ int main(int argc, char **argv) {
   //  f = addr1;
   //    while(!feof(source_file)) {
   //    sem_wait(data_in_memory);
-    nBytes = fread(shm_location, 1, SHM_SIZE, source_file);
+  i = 0;
+  nBytes = 0;
+  while(i = fread(shm_location, 1, SHM_SIZE, source_file)) {
+    nBytes += i;
+    sem_post(data_in_memory);
+    sem_wait(data_in_memory);
+    }
     
     //    memcpy(shm_location, buf, SHM_SIZE);
-    sem_post(data_in_memory);
+
     //  }
   printf("\nMESSAGE STORED\n");
 
