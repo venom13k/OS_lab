@@ -12,24 +12,23 @@
 char SEM1_NAME[]= "copy";
 char SEM2_NAME[]= "disk";
 
-//int main(int argc, char **argv)
-int main()
-{
+int main(int argc, char **argv) {
+
   FILE *source_file;
   int shm_id;
   int nBytes;
   char* shm_location;
-  char* buf = "Good luck!\n";
+  char buf[SHM_SIZE];
   key_t key;
   sem_t *data_in_memory;
   sem_t *data_on_disk;
 
   key = 5678;
 
-  /*  if(argc <= 1) {
+    if(argc <= 1) {
     printf("usage: server /path/to/file/filename \n");
     return 1;
-    }*/
+    }
   
   //create & initialize semaphore #1
   data_in_memory = sem_open(SEM1_NAME, O_CREAT, 0644, 1);
@@ -66,22 +65,23 @@ int main()
 
   //copying your file at the shared location.
   //   memcpy(addr1, &f, SHM_SIZE);
-  /*
+  
   source_file = fopen(argv[1], "r");
   if (source_file == NULL) {
     perror("opening file error");
     return 5;
   }
-  */
+  
 
   //start reading file
   //  f = addr1;
-  //  while(!feof(fp)) {
-  //    sem_wait(mutex);
-  //    nBytes = fread(buf, 1, SHM_SIZE, source_file);
-  memcpy(shm_location, buf, SHM_SIZE);
-  sem_post(data_in_memory);
-    //    }
+  //    while(!feof(source_file)) {
+  //    sem_wait(data_in_memory);
+    nBytes = fread(shm_location, 1, SHM_SIZE, source_file);
+    
+    //    memcpy(shm_location, buf, SHM_SIZE);
+    sem_post(data_in_memory);
+    //  }
   printf("\nMESSAGE STORED\n");
 
   //  sem_wait(data_on_disk);
@@ -99,10 +99,10 @@ int main()
   
   shmctl(shm_id, IPC_RMID, 0);
 
-  /*
+  
   fclose(source_file);
   exit(0);
-  */
+ 
 
 
 

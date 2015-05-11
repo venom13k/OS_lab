@@ -14,9 +14,8 @@ char SEM2_NAME[]= "disk";
 
 
 
-//int main(int argc, char **argv)
-int main()
-{
+int main(int argc, char **argv) {
+
   FILE* destination_file;
   int shm_id;
   char* shm_location;
@@ -26,11 +25,11 @@ int main()
   sem_t *data_on_disk;
 
   key = 5678;
-  /*
- if(argc <= 1) {
+  
+  if(argc <= 1) {
     printf("usage: client /path/to/file/filename \n");
     return 1;
-    }*/
+    }
  
   //create & initialize existing semaphore #1
   data_in_memory = sem_open(SEM1_NAME,0,0644,0);
@@ -64,12 +63,12 @@ int main()
 
 
   //  memcpy(f1, addr1, SHM_SIZE);
-  //destination_file = fopen(argv[1], "w");
+  destination_file = fopen(argv[1], "w");
   //  while(!feof(fp)) {
   //  f1 = addr1;
   sem_wait(data_in_memory);  
-  memcpy(buf, shm_location, SHM_SIZE);    
-  //  fwrite(&buf, 1, SHM_SIZE, destination_file);
+  //  memcpy(buf, shm_location, SHM_SIZE);    
+  fwrite(shm_location, 1, SHM_SIZE, destination_file);
   printf("\nThe message is: %s\n", buf);
 
   *shm_location = '*';
